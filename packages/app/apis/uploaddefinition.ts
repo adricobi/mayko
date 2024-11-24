@@ -18,7 +18,7 @@ the session argument is a session object, with the following shape:
 use the chat if in doubt
 */
 
-import { getAuth } from "protonode";
+import { getAuth,getServiceToken} from "protonode";
 import { API, Protofy, getLogger } from "protobase";
 import { APIContext } from "protolib/bundles/apiContext";
 import { Application } from "express";
@@ -554,7 +554,7 @@ export default Protofy(
       responseMode: "wait",
       app: app,
       onRun: async (params, res) =>
-        API.post("/api/core/v1/devicedefinitions",deviceDef),
+        await API.post("/api/core/v1/devicedefinitions?token="+ getServiceToken(),deviceDef),
     });
   }
 );
