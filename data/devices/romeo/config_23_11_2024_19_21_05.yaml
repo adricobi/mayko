@@ -1,0 +1,52 @@
+esphome:
+  platformio_options:
+    build_flags:
+      - '-DARDUINO_USB_CDC_ON_BOOT=1'
+  name: romeo
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16Mb
+  framework:
+    type: arduino
+logger: {}
+switch:
+  - platform: gpio
+    pin: 46
+    name: ledred
+    id: ledred
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    pin: 13
+    name: pin13
+    id: pin13
+    restore_mode: ALWAYS_OFF
+mqtt:
+  on_message:
+    - topic: devices/romeo/switch/ledred/pulsed_on
+      then:
+        - switch.turn_on: ledred
+        - delay: !lambda return atoi(x.c_str());
+        - switch.turn_off: ledred
+    - topic: devices/romeo/pwm/pwm1/command
+      then:
+        - lambda: 'float value = atof(x.c_str()); id(pwm1).set_level(value);ESP_LOGD("Pwm output pwm1", "Received value: %f", value);'
+    - topic: devices/romeo/switch/pin13/pulsed_on
+      then:
+        - switch.turn_on: pin13
+        - delay: !lambda return atoi(x.c_str());
+        - switch.turn_off: pin13
+  broker: 192.168.0.250
+  port: 1883
+  topic_prefix: devices/romeo
+  username: romeo
+  password: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJvbWVvIiwidHlwZSI6ImRldmljZSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNzMyMzg0ODQyLCJleHAiOjQ4ODgxNDQ4NDJ9.iXtxkZb-w2IvPCPdJbQkHn2z06Clv3YSICjOKx3wAAE
+output:
+  platform: ledc
+  id: pwm1
+  pin: 12
+  frequency: 19531Hz
+wifi:
+  ssid: DEMOFY
+  password: PR0T0FY100
+  power_save_mode: none

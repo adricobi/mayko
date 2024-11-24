@@ -1,0 +1,76 @@
+esphome:
+  platformio_options:
+    build_flags:
+      - '-DARDUINO_USB_CDC_ON_BOOT=1'
+  name: romeo
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16Mb
+  framework:
+    type: arduino
+logger: {}
+output:
+  - platform: ledc
+    id: m3speed
+    pin: 9
+    frequency: 50 Hz
+  - platform: ledc
+    id: m1speed
+    pin: 12
+    frequency: 1220Hz
+  - platform: ledc
+    id: m2speed
+    pin: 14
+    frequency: 1220Hz
+mqtt:
+  on_message:
+    - topic: devices/romeo/pwm/m3speed/command
+      then:
+        - lambda: 'float value = atof(x.c_str()); id(m3speed).set_level(value);ESP_LOGD("Pwm output m3speed", "Received value: %f", value);'
+    - topic: devices/romeo/switch/m3dir/pulsed_on
+      then:
+        - switch.turn_on: m3dir
+        - delay: !lambda return atoi(x.c_str());
+        - switch.turn_off: m3dir
+    - topic: devices/romeo/pwm/m1speed/command
+      then:
+        - lambda: 'float value = atof(x.c_str()); id(m1speed).set_level(value);ESP_LOGD("Pwm output m1speed", "Received value: %f", value);'
+    - topic: devices/romeo/switch/m1dir/pulsed_on
+      then:
+        - switch.turn_on: m1dir
+        - delay: !lambda return atoi(x.c_str());
+        - switch.turn_off: m1dir
+    - topic: devices/romeo/pwm/m2speed/command
+      then:
+        - lambda: 'float value = atof(x.c_str()); id(m2speed).set_level(value);ESP_LOGD("Pwm output m2speed", "Received value: %f", value);'
+    - topic: devices/romeo/switch/m2dir/pulsed_on
+      then:
+        - switch.turn_on: m2dir
+        - delay: !lambda return atoi(x.c_str());
+        - switch.turn_off: m2dir
+  broker: 192.168.0.250
+  port: 1883
+  topic_prefix: devices/romeo
+  username: romeo
+  password: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJvbWVvIiwidHlwZSI6ImRldmljZSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNzMyMzg0ODQyLCJleHAiOjQ4ODgxNDQ4NDJ9.iXtxkZb-w2IvPCPdJbQkHn2z06Clv3YSICjOKx3wAAE
+switch:
+  - platform: gpio
+    pin: 10
+    name: m3dir
+    id: m3dir
+    restore_mode: ALWAYS_ON
+  - platform: gpio
+    pin: 13
+    name: m1dir
+    id: m1dir
+    restore_mode: ALWAYS_ON
+  - platform: gpio
+    pin: 21
+    name: m2dir
+    id: m2dir
+    restore_mode: ALWAYS_OFF
+wifi:
+  ssid: DEMOFY
+  password: PR0T0FY100
+  power_save_mode: none

@@ -1,0 +1,39 @@
+esphome:
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.arduino.memory_type: opi_opi
+    board_upload.maximum_ram_size: 524288
+    build_flags:
+      - '-DBOARD_HAS_PSRAM'
+      - '-DARDUINO_USB_CDC_ON_BOOT=1'
+      - '-mfix-esp32-psram-cache-issue'
+  name: romeo
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  flash_size: 16Mb
+  framework:
+    type: arduino
+logger: {}
+mqtt:
+  broker: 192.168.0.250
+  port: 1883
+  topic_prefix: devices/romeo
+  username: romeo
+  password: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InJvbWVvIiwidHlwZSI6ImRldmljZSIsImFkbWluIjpmYWxzZSwiaWF0IjoxNzMyMzgxOTE0LCJleHAiOjQ4ODgxNDE5MTR9.o7nnvbNtUpSzj7JLOURYaGX5kePs7GM7jF35Te7loQk
+  on_message:
+    - topic: devices/romeo/switch/p1/pulsed_on
+      then:
+        - switch.turn_on: p1
+        - delay: !lambda return atoi(x.c_str());
+        - switch.turn_off: p1
+wifi:
+  ssid: DEMOFY
+  password: PR0T0FY100
+  power_save_mode: none
+switch:
+  platform: gpio
+  pin: 48
+  name: p1
+  id: p1
+  restore_mode: ALWAYS_OFF
