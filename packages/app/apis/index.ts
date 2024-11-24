@@ -8,6 +8,7 @@ import backwardApi from "./backward";
 import forwardApi from "./forward";
 import leftApi from "./left";
 import rightApi from "./right";
+import uploaddefinitionApi from "./uploaddefinition";
 
 const autoApis = Protofy("apis", {
     inoculate: inoculateApi,
@@ -18,7 +19,8 @@ const autoApis = Protofy("apis", {
     backward: backwardApi,
     forward: forwardApi,
     left: leftApi,
-    right: rightApi
+    right: rightApi,
+    uploaddefinition: uploaddefinitionApi
 })
 
 export default (app, context) => {
